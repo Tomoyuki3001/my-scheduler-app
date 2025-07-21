@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import eventRoutes from "./routes/eventRoutes";
 
 dotenv.config();
 
@@ -17,5 +18,7 @@ mongoose
 app.get("/api/ping", (_req, res) => {
   res.send("server is running");
 });
+
+app.use("/api/events", eventRoutes);
 
 export default app;
