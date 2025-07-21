@@ -1,6 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 
-const EventSchema = new Schema(
+const eventSchema = new Schema(
   {
     userId: { type: Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
@@ -11,4 +11,5 @@ const EventSchema = new Schema(
   { timestamps: true }
 );
 
-export const Event = model("Event", EventSchema);
+const Event = model("Event", eventSchema);
+export default Event;
