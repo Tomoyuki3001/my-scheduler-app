@@ -1,18 +1,8 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./styles/globals.css";
-import Header from "./components/Header";
 import Footer from "./components/Footer";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Header from "./components/Header";
+import Navbar from "./components/Navbar";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Calendar App",
@@ -26,8 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="">
+      <body>
         <Header />
+        <Navbar />
         <main className="felx-grow">{children}</main>
         <Footer />
       </body>
