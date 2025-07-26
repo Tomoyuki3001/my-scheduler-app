@@ -7,10 +7,41 @@ export default function CreateEventPage() {
   const [description, setDescription] = useState("");
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ title, description, start, end });
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title,
+          description,
+          start,
+          end,
+          userId: "507f1f77bcf86cd799439011",
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create events");
+      }
+      setMessage("Event created successfully!");
+      setTitle("");
+      setDescription("");
+      setStart("");
+      setEnd("");
+    } catch (err) {
+      setMessage("Error create events");
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,6 +87,7 @@ export default function CreateEventPage() {
           Create Event
         </button>
       </form>
+      {message && <p className="mt-4 text-center">{message}</p>}
     </div>
   );
 }

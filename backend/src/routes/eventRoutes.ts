@@ -5,8 +5,15 @@ const router = express.Router();
 
 router.post("/", async (req, res) => {
   try {
-    const event = await Event.create(req.body);
-    res.status(200).json(event);
+    const { title, description, start, end, userId } = req.body;
+    const newEvent = await Event.create({
+      title,
+      description,
+      start,
+      end,
+      userId,
+    });
+    res.status(200).json(newEvent);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
