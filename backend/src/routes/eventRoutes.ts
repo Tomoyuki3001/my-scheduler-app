@@ -3,6 +3,17 @@ import Event from "../models/Event";
 
 const router = express.Router();
 
+//Get event data
+router.get("/", async (req, res) => {
+  try {
+    const events = await Event.find();
+    res.json(events);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+//Creat an event
 router.post("/", async (req, res) => {
   try {
     const { title, description, start, end, userId } = req.body;
@@ -19,15 +30,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
-  try {
-    const events = await Event.find();
-    res.json(events);
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
+//Update an event data
 router.put("/:id", async (req, res) => {
   try {
     const updatedEvent = await Event.findByIdAndUpdate(
@@ -43,10 +46,11 @@ router.put("/:id", async (req, res) => {
     res.json(updatedEvent);
   } catch (err: any) {
     console.log(err);
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
+//Delete an event data
 router.delete("/:id", async (req, res) => {
   try {
     const deletedEvet = await Event.findByIdAndDelete(req.params.id);
