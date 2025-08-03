@@ -3,8 +3,9 @@ import { Schema, model } from "mongoose";
 const UserSchema = new Schema(
   {
     email: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
-    name: { type: String },
+    password: { type: String, required: true },
+    first_name: { type: String, required: true },
+    last_name: { type: String, required: true },
   },
   { timestamps: true }
 );

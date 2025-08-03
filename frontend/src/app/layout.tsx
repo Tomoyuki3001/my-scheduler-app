@@ -5,7 +5,7 @@ import Navbar from "./components/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Calendar App",
+  title: "My Scheduler App",
   description: "Plan your schedule with ease",
 };
 
