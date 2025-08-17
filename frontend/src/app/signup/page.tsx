@@ -14,12 +14,13 @@ export default function SignupPage() {
     firstName: string;
     lastName: string;
   }) => {
-    const res = await fetch("/signup", {
+    const res = await fetch("http://localhost:5000/api/user/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, firstName, lastName }),
     });
 
+    console.log("res", res);
     if (!res.ok) {
       console.error("Signup failed");
       return;

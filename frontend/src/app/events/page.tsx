@@ -16,7 +16,7 @@ export default function EventListPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/events")
+    fetch("http://localhost:5000/api/event")
       .then((res) => res.json())
       .then((data) => {
         setEvents(data);

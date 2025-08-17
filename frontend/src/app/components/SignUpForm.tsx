@@ -29,7 +29,7 @@ export default function SignUpForm({ onSubmit }: SignUpFormProps) {
       <input
         type="name"
         placeholder="First name"
-        value={email}
+        value={firstName}
         onChange={(e) => setFirstName(e.target.value)}
         className="w-full p-2 border rounded"
         required
@@ -37,7 +37,7 @@ export default function SignUpForm({ onSubmit }: SignUpFormProps) {
       <input
         type="name"
         placeholder="Last name"
-        value={email}
+        value={lastName}
         onChange={(e) => setLastName(e.target.value)}
         className="w-full p-2 border rounded"
         required

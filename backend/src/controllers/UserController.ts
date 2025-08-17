@@ -8,6 +8,7 @@ const bcrypt = require("bcrypt");
 
 export class UserController {
   static async signup(req: Request, res: Response): Promise<void> {
+    console.log(req.body);
     try {
       const { firstName, lastName, email, password }: InterfaceUserInput =
         req.body;
@@ -24,10 +25,10 @@ export class UserController {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const user = await User.create({
-        email,
+        email: email,
         password: hashedPassword,
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
       });
       res.status(200).json({
         status: "warning",
