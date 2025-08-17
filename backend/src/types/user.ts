@@ -5,12 +5,11 @@ export interface InterfaceUser {
   email: string;
   password: string;
   isVerified: Boolean;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export interface InterfaceUserInput {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }

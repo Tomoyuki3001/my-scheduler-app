@@ -1,6 +1,6 @@
 "use client";
 
-import AuthForm from "../components/AuthForm";
+import LoginForm from "../components/LoginForm";
 
 export default function LoginPage() {
   const handleLogin = async ({
@@ -23,5 +23,5 @@ export default function LoginPage() {
     console.log("Login successful");
   };
 
-  return <AuthForm mode="login" onSubmit={handleLogin} />;
+  return <LoginForm onSubmit={handleLogin} />;
 }

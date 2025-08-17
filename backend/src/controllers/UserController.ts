@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
 import { User } from "../models/User";
-import jwt from "jsonwebtoken";
-import { config } from "../config/config";
-import { IUserInput } from "../types/user.types";
+// import jwt from "jsonwebtoken";
+// import { config } from "../config/config";
+import { InterfaceUserInput } from "../types/user";
 
 const bcrypt = require("bcrypt");
 
 export class UserController {
   static async signup(req: Request, res: Response): Promise<void> {
     try {
-      const { name, email, password }: IUserInput = req.body;
+      const { firstName, lastName, email, password }: InterfaceUserInput =
+        req.body;
 
-      // Check if user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         res.status(400).json({
@@ -21,17 +21,15 @@ export class UserController {
         return;
       }
 
-      const hashedPassword = await bcrypt.hash(
-        password,
-        config.bcrypt.saltRounds
-      );
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       const user = await User.create({
-        name,
         email,
         password: hashedPassword,
+        firstName,
+        lastName,
       });
-      res.status(201).json({
+      res.status(200).json({
         status: "warning",
         message:
           "Account created but verification email could not be sent. Please contact support.",
@@ -68,14 +66,14 @@ export class UserController {
         return;
       }
 
-      const token = jwt.sign({ userId: user._id }, config.jwt.secret, {
-        expiresIn: config.jwt.expiresIn,
-      });
+      //   const token = jwt.sign({ userId: user._id }, config.jwt.secret, {
+      //     expiresIn: config.jwt.expiresIn,
+      //   });
 
       res.json({
         status: "success",
         data: {
-          token,
+          //   token,
           user: {
             id: user._id,
             first_name: user.first_name,

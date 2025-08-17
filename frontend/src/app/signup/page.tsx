@@ -1,19 +1,23 @@
 "use client";
 
-import AuthForm from "../components/AuthForm";
+import SignUpForm from "../components/SignUpForm";
 
 export default function SignupPage() {
-  const handleSignup = async ({
+  const handleSignUp = async ({
     email,
     password,
+    firstName,
+    lastName,
   }: {
     email: string;
     password: string;
+    firstName: string;
+    lastName: string;
   }) => {
-    const res = await fetch("/api/signup", {
+    const res = await fetch("/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, firstName, lastName }),
     });
 
     if (!res.ok) {
@@ -23,5 +27,5 @@ export default function SignupPage() {
     console.log("Signup successful");
   };
 
-  return <AuthForm mode="signup" onSubmit={handleSignup} />;
+  return <SignUpForm onSubmit={handleSignUp} />;
 }
