@@ -5,6 +5,8 @@ export interface InterfaceUser {
   email: string;
   password: string;
   isVerified: Boolean;
+  verificationToken?: string;
+  verificationTokenExpires?: Date;
 }
 
 export interface InterfaceUserInput {

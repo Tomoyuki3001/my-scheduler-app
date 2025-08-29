@@ -10,17 +10,27 @@ export default function LoginPage() {
     email: string;
     password: string;
   }) => {
-    const res = await fetch("/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/api/user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (!res.ok) {
-      console.error("Login failed");
-      return;
+      if (!res.ok) {
+        throw new Error("Login failed");
+      }
+
+      const data = await res.json();
+      console.log("data", data);
+      localStorage.setItem("token", data.token);
+
+      console.log("Login successful");
+    } catch (err) {
+      console.log("error", err);
     }
-    console.log("Login successful");
   };
 
   return <LoginForm onSubmit={handleLogin} />;

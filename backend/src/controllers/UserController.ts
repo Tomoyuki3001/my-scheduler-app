@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { User } from "../models/User";
-// import jwt from "jsonwebtoken";
-// import { config } from "../config/config";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { InterfaceUserInput } from "../types/user";
+import { config } from "../config/jwt";
 
 const bcrypt = require("bcrypt");
 
@@ -53,7 +53,7 @@ export class UserController {
       if (!user) {
         res.status(401).json({
           status: "error",
-          message: "Invalid credentials",
+          message: "User not found",
         });
         return;
       }
@@ -67,22 +67,17 @@ export class UserController {
         return;
       }
 
-      //   const token = jwt.sign({ userId: user._id }, config.jwt.secret, {
-      //     expiresIn: config.jwt.expiresIn,
-      //   });
+      const options: SignOptions = {
+        expiresIn: "1h",
+      };
 
-      res.json({
-        status: "success",
-        data: {
-          //   token,
-          user: {
-            id: user._id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            email: user.email,
-          },
-        },
-      });
+      const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET as string,
+        options
+      );
+
+      res.status(200).json({ token });
     } catch (error) {
       res.status(500).json({
         status: "error",
