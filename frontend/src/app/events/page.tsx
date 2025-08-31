@@ -26,7 +26,7 @@ export default function EventListPage() {
 
   const handleUpdate = async (id: string) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/event/${id}`, {
         method: "PUT",
         body: JSON.stringify({
           id,
@@ -48,7 +48,7 @@ export default function EventListPage() {
       return;
     }
 
-    await fetch(`http://localhost:5000/api/events/${id}`, { method: "DELETE" });
+    await fetch(`http://localhost:5000/api/event/${id}`, { method: "DELETE" });
     setEvents(events.filter((event) => event._id !== id));
   };
 
