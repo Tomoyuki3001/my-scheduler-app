@@ -16,7 +16,7 @@ export default function CreateEventPage() {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/events", {
+      const res = await fetch("http://localhost:5000/api/event", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -43,6 +43,8 @@ export default function CreateEventPage() {
       setLoading(false);
     }
   };
+
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow rounded">

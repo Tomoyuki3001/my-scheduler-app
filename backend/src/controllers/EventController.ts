@@ -11,7 +11,7 @@ export class EventController {
     }
   }
 
-  static async createEvent(req: Request, res: Response) {
+  static async createEvent(req: Request, res: Response): Promise<void> {
     try {
       const { title, description, start, end, userId } = req.body;
       const newEvent = await Event.create({
@@ -23,7 +23,7 @@ export class EventController {
       });
       res.status(200).json(newEvent);
     } catch (err: any) {
-      res.status(400).json({ error: err.message });
+      res.status(500).json({ error: err.message });
     }
   }
 
@@ -39,7 +39,7 @@ export class EventController {
       if (!updatedEvent) {
         return res.status(404).json({ error: "The event not found" });
       }
-      res.json(updatedEvent);
+      res.status(200).json(updatedEvent);
     } catch (err: any) {
       console.log(err);
       res.status(500).json({ error: err.message });
@@ -52,7 +52,7 @@ export class EventController {
       if (!deletedEvet) {
         return res.status(404).json({ error: "The event not found" });
       }
-      res.json({ message: "The event deleted successfully!" });
+      res.status(200).json({ message: "The event deleted successfully!" });
     } catch (err: any) {
       res.status(500).json({ error: "Failed to delete event" });
     }
