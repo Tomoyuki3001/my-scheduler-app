@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import EditEventModal from "../components/EditEventModal";
 
 interface EventType {
   _id: string;
@@ -14,6 +15,13 @@ interface EventType {
 export default function EventListPage() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
+
+  const handleEditClick = (event: EventType) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     fetch("http://localhost:5000/api/event")
@@ -24,7 +32,7 @@ export default function EventListPage() {
       });
   }, []);
 
-  const handleUpdate = async (id: string) => {
+  const handleSave = async (id: string) => {
     try {
       const res = await fetch(`http://localhost:5000/api/event/${id}`, {
         method: "PUT",
@@ -70,7 +78,7 @@ export default function EventListPage() {
             <div className="space-x-2">
               <button
                 className="bg-blue-600 text-white px-3 py-1 rounded"
-                onClick={() => handleUpdate(event._id)}
+                onClick={() => handleEditClick(event)}
               >
                 Edit
               </button>
@@ -84,6 +92,12 @@ export default function EventListPage() {
           </li>
         ))}
       </ul>
+      <EditEventModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+        event={selectedEvent}
+      />
     </div>
   );
 }
