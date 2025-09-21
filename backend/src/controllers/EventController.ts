@@ -36,6 +36,7 @@ export class EventController {
           new: true,
         }
       );
+      console.log(updatedEvent);
       if (!updatedEvent) {
         return res.status(404).json({ error: "The event not found" });
       }

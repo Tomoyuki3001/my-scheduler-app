@@ -32,13 +32,14 @@ export default function EventListPage() {
       });
   }, []);
 
-  const handleSave = async (id: string) => {
+  const handleUpdate = async (event: EventType) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/event/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/event/${event._id}`, {
         method: "PUT",
-        body: JSON.stringify({
-          id,
-        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(event),
       });
 
       if (!res.ok) {
@@ -46,8 +47,6 @@ export default function EventListPage() {
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -77,13 +76,13 @@ export default function EventListPage() {
             </div>
             <div className="space-x-2">
               <button
-                className="bg-blue-600 text-white px-3 py-1 rounded"
+                className="bg-blue-600 text-white px-3 py-1 rounded cursor-pointer"
                 onClick={() => handleEditClick(event)}
               >
                 Edit
               </button>
               <button
-                className="bg-red-600 text-white px-3 py-1 rounded"
+                className="bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
                 onClick={() => handleDelete(event._id)}
               >
                 Delete
@@ -92,12 +91,14 @@ export default function EventListPage() {
           </li>
         ))}
       </ul>
-      <EditEventModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        event={selectedEvent}
-      />
+      {selectedEvent && (
+        <EditEventModal
+          event={selectedEvent}
+          onSave={handleUpdate}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

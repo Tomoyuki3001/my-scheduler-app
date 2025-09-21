@@ -1,73 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+type Event = {
+  _id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  start: string;
+  end: string;
+};
 
 type EditEventModalProps = {
+  event: Event;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (
-    id: string,
-    updatedData: {
-      title: string;
-      description?: string;
-      start: string;
-      end: string;
-    }
-  ) => void;
-  event: {
-    _id: string;
-    userId: string;
-    title: string;
-    description?: string;
-    start: string;
-    end: string;
-  } | null;
+  onSave: (updatedEvent: Event) => void;
 };
 
 export default function EditEventModal({
+  event,
   isOpen,
   onClose,
   onSave,
-  event,
 }: EditEventModalProps) {
   const formatDateTimeLocal = (dateString: string) => {
     const date = new Date(dateString);
     return date.toISOString().slice(0, 16);
   };
 
-  console.log("event", event);
-  const [title, setTitle] = useState(event?.title);
-  const [description, setDescription] = useState(event?.description);
-  const [start, setStart] = useState(
-    event?.start ? formatDateTimeLocal(event.start) : ""
-  );
-  const [end, setEnd] = useState(
-    event?.end ? formatDateTimeLocal(event.end) : ""
-  );
+  const [title, setTitle] = useState(event.title);
+  const [description, setDescription] = useState(event.description);
+  const [start, setStart] = useState(formatDateTimeLocal(event.start));
+  const [end, setEnd] = useState(formatDateTimeLocal(event.end));
 
-  console.log("title", title);
+  useEffect(() => {
+    if (event) {
+      setTitle(event.title);
+      setDescription(event.description);
+      setStart(formatDateTimeLocal(event.start));
+      setEnd(formatDateTimeLocal(event.end));
+    }
+  }, [event]);
+
   if (!isOpen || !event) return null;
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   try {
-  //     const res = await fetch(`http://localhost:5000/api/event/${id}`, {
-  //       method: "PUT",
-  //       body: JSON.stringify({}),
-  //     });
-
-  //     if (!res.ok) {
-  //       throw new Error("Failed to update");
-  //     }
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  //   window.location.reload();
-  // };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(event._id, { title, description, start, end });
+    onSave({ ...event, title, description, start, end });
     onClose();
   };
 
@@ -111,14 +91,14 @@ export default function EditEventModal({
             <div className="flex justify-end gap-2">
               <button
                 type="button"
-                className="px-4 py-2 border rounded"
+                className="px-4 py-2 border rounded cursor-pointer"
                 onClick={() => onClose()}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded"
+                className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer"
               >
                 Save
               </button>
