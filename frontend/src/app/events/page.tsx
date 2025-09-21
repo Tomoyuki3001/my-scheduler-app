@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import EditEventModal from "../components/EditEventModal";
 
 interface EventType {
   _id: string;
@@ -14,6 +15,13 @@ interface EventType {
 export default function EventListPage() {
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
+
+  const handleEditClick = (event: EventType) => {
+    setSelectedEvent(event);
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     fetch("http://localhost:5000/api/event")
@@ -24,13 +32,14 @@ export default function EventListPage() {
       });
   }, []);
 
-  const handleUpdate = async (id: string) => {
+  const handleUpdate = async (event: EventType) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/event/${event._id}`, {
         method: "PUT",
-        body: JSON.stringify({
-          id,
-        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(event),
       });
 
       if (!res.ok) {
@@ -38,8 +47,6 @@ export default function EventListPage() {
       }
     } catch (err) {
       console.log(err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -48,7 +55,7 @@ export default function EventListPage() {
       return;
     }
 
-    await fetch(`http://localhost:5000/api/events/${id}`, { method: "DELETE" });
+    await fetch(`http://localhost:5000/api/event/${id}`, { method: "DELETE" });
     setEvents(events.filter((event) => event._id !== id));
   };
 
@@ -69,13 +76,13 @@ export default function EventListPage() {
             </div>
             <div className="space-x-2">
               <button
-                className="bg-blue-600 text-white px-3 py-1 rounded"
-                onClick={() => handleUpdate(event._id)}
+                className="bg-blue-600 text-white px-3 py-1 rounded cursor-pointer"
+                onClick={() => handleEditClick(event)}
               >
                 Edit
               </button>
               <button
-                className="bg-red-600 text-white px-3 py-1 rounded"
+                className="bg-red-600 text-white px-3 py-1 rounded cursor-pointer"
                 onClick={() => handleDelete(event._id)}
               >
                 Delete
@@ -84,6 +91,14 @@ export default function EventListPage() {
           </li>
         ))}
       </ul>
+      {selectedEvent && (
+        <EditEventModal
+          event={selectedEvent}
+          onSave={handleUpdate}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

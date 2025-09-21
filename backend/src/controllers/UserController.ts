@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 import { User } from "../models/User";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { InterfaceUserInput } from "../types/user";
-import { config } from "../config/jwt";
+import crypto from "crypto";
 
 const bcrypt = require("bcrypt");
 
 export class UserController {
   static async signup(req: Request, res: Response): Promise<void> {
-    console.log(req.body);
     try {
       const { firstName, lastName, email, password }: InterfaceUserInput =
         req.body;
@@ -22,6 +21,7 @@ export class UserController {
         return;
       }
 
+      const verificationToken = crypto.randomBytes(32).toString("hex");
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const user = await User.create({
@@ -29,12 +29,11 @@ export class UserController {
         password: hashedPassword,
         first_name: firstName,
         last_name: lastName,
+        verificationToken,
+        verificationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       });
       res.status(200).json({
-        status: "warning",
-        message:
-          "Account created but verification email could not be sent. Please contact support.",
-        userId: user._id,
+        message: "User created successfully",
       });
     } catch (error) {
       console.error("Signup error:", error);
@@ -77,7 +76,7 @@ export class UserController {
         options
       );
 
-      res.status(200).json({ token });
+      res.status(200);
     } catch (error) {
       res.status(500).json({
         status: "error",

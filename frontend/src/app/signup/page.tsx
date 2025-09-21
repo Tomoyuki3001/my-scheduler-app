@@ -25,7 +25,7 @@ export default function SignupPage() {
       console.error("Signup failed");
       return;
     }
-    console.log("Signup successful");
+    console.log("User created successfully");
   };
 
   return <SignUpForm onSubmit={handleSignUp} />;
