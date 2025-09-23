@@ -76,7 +76,10 @@ export class UserController {
         options
       );
 
-      res.status(200);
+      res.status(200).json({
+        status: "success",
+        token,
+      });
     } catch (error) {
       res.status(500).json({
         status: "error",

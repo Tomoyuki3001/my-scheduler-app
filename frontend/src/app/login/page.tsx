@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import LoginForm from "../components/LoginForm";
 
 export default function LoginPage() {
@@ -24,8 +25,7 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-      console.log("data", data);
-      localStorage.setItem("token", data.token);
+      Cookies.set("token", data.token, { expires: 7 });
 
       console.log("Login successful");
     } catch (err) {
