@@ -30,7 +30,6 @@ export default function LoginPage() {
       const data = await res.json();
       console.log("Login successful");
 
-      // Redirect to events page after successful login
       router.push("/events");
     } catch (err) {
       console.log("error", err);
