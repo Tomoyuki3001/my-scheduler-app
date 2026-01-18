@@ -1,9 +1,11 @@
 "use client";
 
-import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import LoginForm from "../components/LoginForm";
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const handleLogin = async ({
     email,
     password,
@@ -17,6 +19,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Important: sends cookies with request
         body: JSON.stringify({ email, password }),
       });
 
@@ -25,9 +28,10 @@ export default function LoginPage() {
       }
 
       const data = await res.json();
-      Cookies.set("token", data.token, { expires: 7 });
-
       console.log("Login successful");
+
+      // Redirect to events page after successful login
+      router.push("/events");
     } catch (err) {
       console.log("error", err);
     }

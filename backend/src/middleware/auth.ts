@@ -11,8 +11,7 @@ export function authenticate(
   res: Response,
   next: NextFunction
 ) {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.split(" ")[1];
+  const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "Authentication token required" });
@@ -22,7 +21,7 @@ export function authenticate(
     const decoded = jwt.verify(token, config.jwt.secret as string) as {
       userId?: string;
     };
-    req.body.userId = decoded.userId;
+    req.userId = decoded.userId;
     next();
   } catch (err) {
     res.status(401).json({ error: "Invalid token" });

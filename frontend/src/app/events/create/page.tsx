@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function CreateEventPage() {
   const [title, setTitle] = useState("");
@@ -9,7 +9,6 @@ export default function CreateEventPage() {
   const [end, setEnd] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [token, setToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,12 +16,12 @@ export default function CreateEventPage() {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/event", {
+      const res = await fetch("http://localhost:5000/api/event/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
+        credentials: "include", // Send cookies with request
         body: JSON.stringify({
           title,
           description,
@@ -40,18 +39,12 @@ export default function CreateEventPage() {
       setDescription("");
       setStart("");
       setEnd("");
-    } catch (err) {
+    } catch (err: unknown) {
       setMessage("Error create events");
-      console.log(err);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-  }, []);
 
   if (loading) return <p>Loading...</p>;
 

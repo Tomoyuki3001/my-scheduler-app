@@ -3,7 +3,6 @@ import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
 export function middleware(req: NextRequest) {
-  console.log("token", req);
   const token = req.cookies.get("token")?.value;
 
   const protectedRoutes = ["/events/create"];
