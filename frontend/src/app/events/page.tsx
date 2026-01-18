@@ -24,7 +24,9 @@ export default function EventListPage() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/event")
+    fetch("http://localhost:5000/api/event", {
+      credentials: "include", // Send cookies with request
+    })
       .then((res) => res.json())
       .then((data) => {
         setEvents(data);
@@ -39,6 +41,7 @@ export default function EventListPage() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Send cookies with request
         body: JSON.stringify(event),
       });
 
@@ -55,7 +58,10 @@ export default function EventListPage() {
       return;
     }
 
-    await fetch(`http://localhost:5000/api/event/${id}`, { method: "DELETE" });
+    await fetch(`http://localhost:5000/api/event/${id}`, {
+      method: "DELETE",
+      credentials: "include", // Send cookies with request
+    });
     setEvents(events.filter((event) => event._id !== id));
   };
 

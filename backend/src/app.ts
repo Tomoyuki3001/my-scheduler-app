@@ -1,15 +1,20 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
 import eventRoutes from "./routes/eventRoutes";
 import userRoutes from "./routes/userRoute";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
-dotenv.config();
+app.use(cookieParser());
 
 mongoose
   .connect(process.env.MONGO_URI || "")

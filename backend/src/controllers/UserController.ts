@@ -32,7 +32,26 @@ export class UserController {
         verificationToken,
         verificationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       });
+
+      const options: SignOptions = {
+        expiresIn: "1h",
+      };
+
+      const token = jwt.sign(
+        { userId: user._id },
+        process.env.JWT_SECRET as string,
+        options
+      );
+
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 3600000,
+      });
+
       res.status(200).json({
+        status: "success",
         message: "User created successfully",
       });
     } catch (error) {
@@ -76,7 +95,17 @@ export class UserController {
         options
       );
 
-      res.status(200);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 3600000,
+      });
+
+      res.status(200).json({
+        status: "success",
+        message: "Login successful",
+      });
     } catch (error) {
       res.status(500).json({
         status: "error",

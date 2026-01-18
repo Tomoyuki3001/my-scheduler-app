@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import SignUpForm from "../components/SignUpForm";
 
 export default function SignupPage() {
+  const router = useRouter();
+
   const handleSignUp = async ({
     email,
     password,
@@ -14,18 +17,25 @@ export default function SignupPage() {
     firstName: string;
     lastName: string;
   }) => {
-    const res = await fetch("http://localhost:5000/api/user/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password, firstName, lastName }),
-    });
+    try {
+      const res = await fetch("http://localhost:5000/api/user/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // Receive and send cookies
+        body: JSON.stringify({ email, password, firstName, lastName }),
+      });
 
-    console.log("res", res);
-    if (!res.ok) {
-      console.error("Signup failed");
-      return;
+      if (!res.ok) {
+        console.error("Signup failed");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("User created successfully");
+      router.push("/events");
+    } catch (err) {
+      console.error("Signup error:", err);
     }
-    console.log("User created successfully");
   };
 
   return <SignUpForm onSubmit={handleSignUp} />;

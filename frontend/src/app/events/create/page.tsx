@@ -16,9 +16,12 @@ export default function CreateEventPage() {
     setMessage("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/event", {
+      const res = await fetch("http://localhost:5000/api/event/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Send cookies with request
         body: JSON.stringify({
           title,
           description,
@@ -36,9 +39,8 @@ export default function CreateEventPage() {
       setDescription("");
       setStart("");
       setEnd("");
-    } catch (err) {
+    } catch (err: unknown) {
       setMessage("Error create events");
-      console.log(err);
     } finally {
       setLoading(false);
     }
