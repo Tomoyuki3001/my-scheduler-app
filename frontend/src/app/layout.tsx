@@ -1,7 +1,6 @@
 import "./styles/globals.css";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import Navbar from "./components/Navbar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -16,9 +15,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="flex flex-col min-h-screen">
         <Header />
-        <Navbar />
         <main className="felx-grow">{children}</main>
         <Footer />
       </body>
