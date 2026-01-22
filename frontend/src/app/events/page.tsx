@@ -14,7 +14,6 @@ interface EventType {
 
 export default function EventListPage() {
   const [events, setEvents] = useState<EventType[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
 
@@ -64,8 +63,6 @@ export default function EventListPage() {
     });
     setEvents(events.filter((event) => event._id !== id));
   };
-
-  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="max-w-7xl mx-auto mt-10 py-16 px-4">

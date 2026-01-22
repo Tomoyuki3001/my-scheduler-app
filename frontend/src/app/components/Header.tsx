@@ -31,10 +31,10 @@ export default function Header() {
               Create
             </Link>
             <Link
-              href="/signup"
+              href="/login"
               className="bg-blue-300 px-6 py-2.5 rounded-lg text-sm font-medium"
             >
-              Sign up
+              Login
             </Link>
           </nav>
         </div>
