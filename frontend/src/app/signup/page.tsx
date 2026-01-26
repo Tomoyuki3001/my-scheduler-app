@@ -21,7 +21,7 @@ export default function SignupPage() {
       const res = await fetch("http://localhost:5000/api/user/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // Receive and send cookies
+        credentials: "include",
         body: JSON.stringify({ email, password, firstName, lastName }),
       });
 
@@ -32,6 +32,10 @@ export default function SignupPage() {
 
       const data = await res.json();
       console.log("User created successfully");
+
+      // Dispatch event to notify Header to refresh auth status
+      window.dispatchEvent(new Event('auth-status-changed'));
+
       router.push("/events");
     } catch (err) {
       console.error("Signup error:", err);

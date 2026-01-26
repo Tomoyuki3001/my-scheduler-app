@@ -40,7 +40,7 @@ export default function EventListPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Send cookies with request
+        credentials: "include",
         body: JSON.stringify(event),
       });
 
@@ -59,7 +59,7 @@ export default function EventListPage() {
 
     await fetch(`http://localhost:5000/api/event/${id}`, {
       method: "DELETE",
-      credentials: "include", // Send cookies with request
+      credentials: "include",
     });
     setEvents(events.filter((event) => event._id !== id));
   };

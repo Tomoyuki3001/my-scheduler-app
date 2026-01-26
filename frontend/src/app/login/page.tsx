@@ -19,7 +19,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // Important: sends cookies with request
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
@@ -27,9 +27,7 @@ export default function LoginPage() {
         throw new Error("Login failed");
       }
 
-      const data = await res.json();
-      console.log("Login successful");
-
+      window.dispatchEvent(new Event('auth-status-changed'));
       router.push("/events");
     } catch (err) {
       console.log("error", err);
