@@ -113,4 +113,109 @@ export class UserController {
       });
     }
   }
+
+  static async status(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.cookies?.token;
+
+      if (!token) {
+        res.status(200).json({ isLoggedIn: false });
+        return;
+      }
+
+      try {
+        jwt.verify(token, process.env.JWT_SECRET as string);
+        res.status(200).json({ isLoggedIn: true });
+      } catch {
+        res.status(200).json({ isLoggedIn: false });
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Internal server error",
+      });
+    }
+  }
+
+  static async logout(req: Request, res: Response): Promise<void> {
+    try {
+      res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      res.status(200).json({
+        status: "success",
+        message: "Logout successful",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Internal server error",
+      });
+    }
+  }
+
+  static async getProfile(req: Request, res: Response): Promise<void> {
+    try {
+      const token = req.cookies?.token;
+
+      if (!token) {
+        res.status(401).json({
+          status: "error",
+          message: "Authentication required",
+        });
+        return;
+      }
+
+      try {
+        const decoded = jwt.verify(
+          token,
+          process.env.JWT_SECRET as string
+        ) as { userId?: string };
+
+        if (!decoded.userId) {
+          res.status(401).json({
+            status: "error",
+            message: "Invalid token",
+          });
+          return;
+        }
+
+        const user = await User.findById(decoded.userId).select(
+          "-password -verificationToken -verificationTokenExpires"
+        );
+
+        if (!user) {
+          res.status(404).json({
+            status: "error",
+            message: "User not found",
+          });
+          return;
+        }
+
+        res.status(200).json({
+          status: "success",
+          data: {
+            id: user._id,
+            email: user.email,
+            firstName: user.first_name,
+            lastName: user.last_name,
+            isVerified: user.isVerified,
+          },
+        });
+      } catch (error) {
+        res.status(401).json({
+          status: "error",
+          message: "Invalid token",
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        message: "Internal server error",
+      });
+    }
+  }
 }

@@ -1,4 +1,4 @@
-import Dashboard from "./dashboard/page";
+import Dashboard from "./pages/home/page";
 
 export default function Home() {
   return (
@@ -10,8 +10,8 @@ export default function Home() {
             <span className="block text-blue-600">effortlessly.</span>
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            A beautiful calendar app designed to help you organize your schedule,
-            track your events, and make the most of every day.
+            A beautiful calendar app designed to help you organize your
+            schedule, track your events, and make the most of every day.
           </p>
         </div>
       </section>

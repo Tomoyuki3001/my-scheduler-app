@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import SignUpForm from "../components/SignUpForm";
+import SignUpForm from "../../../../components/SignUpForm";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -18,10 +18,10 @@ export default function SignupPage() {
     lastName: string;
   }) => {
     try {
-      const res = await fetch("http://localhost:5000/api/user/signup", {
+      const res = await fetch("http://localhost:5000/api/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // Receive and send cookies
+        credentials: "include",
         body: JSON.stringify({ email, password, firstName, lastName }),
       });
 
@@ -30,9 +30,9 @@ export default function SignupPage() {
         return;
       }
 
-      const data = await res.json();
-      console.log("User created successfully");
-      router.push("/events");
+      window.dispatchEvent(new Event("auth-status-changed"));
+
+      router.push("/pages/events");
     } catch (err) {
       console.error("Signup error:", err);
     }
