@@ -1,8 +1,7 @@
-import { Schema, model, Types } from "mongoose";
+import { Schema, model } from "mongoose";
 
 const eventSchema = new Schema(
   {
-    userId: { type: Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true, trim: true },
     description: { type: String, required: true, trim: true },
     start: { type: Date, required: true },

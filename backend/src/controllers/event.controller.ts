@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
-import Event from "../models/Event";
+import Event from "../models/event.model";
+import { createEventSchema } from "../../../shared/schemas/event.schema";
+import { InterfaceEventInput } from "../types/event";
 
 export class EventController {
   static async getEvent(req: Request, res: Response): Promise<void> {
@@ -13,17 +15,35 @@ export class EventController {
 
   static async createEvent(req: Request, res: Response): Promise<void> {
     try {
-      const { title, description, start, end, userId } = req.body;
+      const { title, description, start, end }: InterfaceEventInput = req.body;
+
+      const validatedData = createEventSchema.safeParse({
+        title,
+        description,
+        start,
+        end,
+      });
+      if (!validatedData.success) {
+        res.status(400).json({
+          status: "error",
+          message: "Validation failed",
+          details: {
+            fieldErrors: validatedData.error.flatten().fieldErrors,
+            formErrors: validatedData.error.flatten().formErrors,
+          },
+        });
+        return;
+      }
+
       const newEvent = await Event.create({
         title,
         description,
         start,
         end,
-        userId,
       });
       res.status(200).json(newEvent);
     } catch (err: any) {
-      res.status(500).json({ error: err.message });
+      res.status(500).json({ error: err });
     }
   }
 
@@ -34,7 +54,7 @@ export class EventController {
         req.body,
         {
           new: true,
-        }
+        },
       );
       if (!updatedEvent) {
         return res.status(404).json({ error: "The event not found" });
