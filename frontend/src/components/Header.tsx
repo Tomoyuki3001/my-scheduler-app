@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 
 export default function Header() {
   const router = useRouter();
@@ -10,11 +10,11 @@ export default function Header() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const checkAuthStatus = () => {
-    fetch('http://localhost:5000/api/user/status', {
-      credentials: 'include',
+    fetch("http://localhost:5000/api/users/status", {
+      credentials: "include",
     })
-      .then(res => res.json())
-      .then(data => setIsLoggedIn(data.isLoggedIn))
+      .then((res) => res.json())
+      .then((data) => setIsLoggedIn(data.isLoggedIn))
       .catch(() => setIsLoggedIn(false));
   };
 
@@ -22,22 +22,22 @@ export default function Header() {
     checkAuthStatus();
 
     const handleFocus = () => checkAuthStatus();
-    window.addEventListener('focus', handleFocus);
+    window.addEventListener("focus", handleFocus);
 
     const handleAuthChange = () => checkAuthStatus();
-    window.addEventListener('auth-status-changed', handleAuthChange);
+    window.addEventListener("auth-status-changed", handleAuthChange);
 
     return () => {
-      window.removeEventListener('focus', handleFocus);
-      window.removeEventListener('auth-status-changed', handleAuthChange);
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("auth-status-changed", handleAuthChange);
     };
   }, [pathname]);
 
   const handleCreateClick = () => {
     if (!isLoggedIn) {
-      router.push('/login');
+      router.push("/pages/auth/login");
     } else {
-      router.push('/events/create');
+      router.push("/pages/events/create");
     }
   };
 
@@ -45,7 +45,10 @@ export default function Header() {
     <header className="bg-slate-900 text-white">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <span className="text-xl font-semibold">TimeFlow</span>
           </Link>
 
@@ -57,7 +60,7 @@ export default function Header() {
               Home
             </Link>
             <Link
-              href="/events"
+              href="/pages/events"
               className="text-sm font-medium hover:text-blue-400 transition-colors"
             >
               Events
@@ -70,7 +73,7 @@ export default function Header() {
             </button>
             {isLoggedIn ? (
               <Link
-                href="/profile"
+                href="/pages/user"
                 className="p-2 rounded-full hover:bg-slate-800 transition-colors"
                 title="Profile"
               >
@@ -91,7 +94,7 @@ export default function Header() {
               </Link>
             ) : (
               <Link
-                href="/login"
+                href="/pages/auth/login"
                 className="bg-blue-300 text-slate-900 px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
               >
                 Login
