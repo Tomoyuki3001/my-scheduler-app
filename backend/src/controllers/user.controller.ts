@@ -3,7 +3,7 @@ import { User } from "../models/user.model";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { InterfaceUserInput } from "../types/user";
 import crypto from "crypto";
-import { createUserSchema } from "../../../shared/schemas/auth.schema";
+import { authUserSchema } from "../../../shared/schemas/auth.schema";
 import { editUserSchema } from "../../../shared/schemas/user.schema";
 
 const bcrypt = require("bcrypt");
@@ -14,7 +14,7 @@ export class UserController {
       const { firstName, lastName, email, password }: InterfaceUserInput =
         req.body;
 
-      const validatedData = createUserSchema.safeParse({
+      const validatedData = authUserSchema.safeParse({
         firstName,
         lastName,
         email,
@@ -185,47 +185,40 @@ export class UserController {
         return;
       }
 
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-          userId?: string;
-        };
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+        userId?: string;
+      };
 
-        if (!decoded.userId) {
-          res.status(401).json({
-            status: "error",
-            message: "Invalid token",
-          });
-          return;
-        }
-
-        const user = await User.findById(decoded.userId).select(
-          "-password -verificationToken -verificationTokenExpires",
-        );
-
-        if (!user) {
-          res.status(404).json({
-            status: "error",
-            message: "User not found",
-          });
-          return;
-        }
-
-        res.status(200).json({
-          status: "success",
-          data: {
-            id: user._id,
-            email: user.email,
-            firstName: user.first_name,
-            lastName: user.last_name,
-            isVerified: user.isVerified,
-          },
-        });
-      } catch (error) {
+      if (!decoded.userId) {
         res.status(401).json({
           status: "error",
           message: "Invalid token",
         });
+        return;
       }
+
+      const user = await User.findById(decoded.userId).select(
+        "-password -verificationToken -verificationTokenExpires",
+      );
+
+      if (!user) {
+        res.status(404).json({
+          status: "error",
+          message: "User not found",
+        });
+        return;
+      }
+
+      res.status(200).json({
+        status: "success",
+        data: {
+          id: user._id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          isVerified: user.isVerified,
+        },
+      });
     } catch (error) {
       res.status(500).json({
         status: "error",

@@ -20,7 +20,7 @@ export default function Page() {
   const [deleteModal, setDeleteModal] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/users/profile", {
+    fetch("http://localhost:5000/api/users/me", {
       credentials: "include",
     })
       .then((res) => {
@@ -58,7 +58,7 @@ export default function Page() {
 
   const handleEditProfile = async () => {
     try {
-      await fetch(`http://localhost:5000/api/users/profile/${profile?.id}`, {
+      await fetch(`http://localhost:5000/api/users/${profile?.id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -81,7 +81,7 @@ export default function Page() {
   const handleDeleteProfile = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/users/profile/${profile?.id}`,
+        `http://localhost:5000/api/users/${profile?.id}`,
         {
           method: "DELETE",
           credentials: "include",

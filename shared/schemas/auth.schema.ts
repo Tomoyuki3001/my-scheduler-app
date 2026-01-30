@@ -31,11 +31,11 @@ const passwordSchema = z
     "Password must contain at least one uppercase letter, one lowercase letter, one number and one special character",
   );
 
-export const createUserSchema = z.object({
+export const authUserSchema = z.object({
   firstName: firstNameSchema,
   lastName: lastNameSchema,
   email: emailSchema,
   password: passwordSchema,
 });
 
-export type CreateUserInput = z.infer<typeof createUserSchema>;
+export type AuthUserInfo = z.infer<typeof authUserSchema>;

@@ -9,9 +9,16 @@ export interface AuthRequest extends Request {
 export function authenticate(
   req: AuthRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
-  const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+  const authHeader = req.headers.authorization;
+  let token: string | undefined;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
+  } else if ((req as any).cookies?.token) {
+    token = (req as any).cookies?.token;
+  }
 
   if (!token) {
     return res.status(401).json({ message: "Authentication token required" });
