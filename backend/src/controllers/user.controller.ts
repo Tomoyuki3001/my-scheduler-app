@@ -43,8 +43,8 @@ export class UserController {
       const user = await User.create({
         email: email,
         password: hashedPassword,
-        first_name: firstName,
-        last_name: lastName,
+        firstName: firstName,
+        lastName: lastName,
         verificationToken,
         verificationTokenExpires: new Date(Date.now() + 24 * 60 * 60 * 1000),
       });
@@ -56,7 +56,7 @@ export class UserController {
       const token = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET as string,
-        options,
+        options
       );
 
       res.cookie("token", token, {
@@ -108,7 +108,7 @@ export class UserController {
       const token = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET as string,
-        options,
+        options
       );
 
       res.cookie("token", token, {
@@ -198,7 +198,7 @@ export class UserController {
       }
 
       const user = await User.findById(decoded.userId).select(
-        "-password -verificationToken -verificationTokenExpires",
+        "-password -verificationToken -verificationTokenExpires"
       );
 
       if (!user) {
@@ -214,8 +214,8 @@ export class UserController {
         data: {
           id: user._id,
           email: user.email,
-          firstName: user.first_name,
-          lastName: user.last_name,
+          firstName: user.firstName,
+          lastName: user.lastName,
           isVerified: user.isVerified,
         },
       });
@@ -254,8 +254,8 @@ export class UserController {
     }
 
     try {
-      user.first_name = firstName;
-      user.last_name = lastName;
+      user.firstName = firstName;
+      user.lastName = lastName;
       user.email = email;
       await user.save();
 
