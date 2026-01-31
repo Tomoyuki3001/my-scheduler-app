@@ -4,12 +4,11 @@ import { BookingController } from "../controllers/booking.controller";
 
 const router = express.Router();
 
-console.log("booking.routes");
-
 router.use(authenticate);
 router.get("/", BookingController.getBooking);
-router.post("/", BookingController.createBooking);
-router.put("/:id", BookingController.updateBooking);
-router.delete("/:id", BookingController.deleteBooking);
+router.get("/:eventId", BookingController.getBookingDetails);
+router.post("/:eventId", BookingController.createBooking);
+router.put("/:bookingId", BookingController.updateBooking);
+router.delete("/:bookingId", BookingController.deleteBooking);
 
 export default router;

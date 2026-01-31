@@ -6,6 +6,12 @@ const eventSchema = new Schema(
     description: { type: String, required: true, trim: true },
     start: { type: Date, required: true },
     end: { type: Date, required: true },
+    location: {
+      street: { type: String, required: true, trim: true },
+      city: { type: String, required: true, trim: true },
+      state: { type: String, required: true, trim: true },
+      postalCode: { type: String, required: true, trim: true },
+    },
   },
   { timestamps: true }
 );

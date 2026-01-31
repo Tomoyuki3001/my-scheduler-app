@@ -12,9 +12,21 @@ export default function CreateEventPage() {
   const [endTime, setEndTime] = useState("");
   const [message, setMessage] = useState("");
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [postalCode, setPostalCode] = useState("");
 
   const hasUnsavedChanges =
-    title || description || eventDate || startTime || endTime;
+    title ||
+    description ||
+    eventDate ||
+    startTime ||
+    endTime ||
+    street ||
+    city ||
+    state ||
+    postalCode;
 
   const combineDateTime = (date: string, time: string): string => {
     if (!date || !time) return "";
@@ -24,7 +36,10 @@ export default function CreateEventPage() {
 
   const today = (() => {
     const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(d.getDate()).padStart(2, "0")}`;
   })();
 
   const handleCancel = () => {
@@ -85,6 +100,7 @@ export default function CreateEventPage() {
           description,
           start,
           end,
+          location: { street, city, state, postalCode },
         }),
       });
 
@@ -103,6 +119,10 @@ export default function CreateEventPage() {
       setEventDate("");
       setStartTime("");
       setEndTime("");
+      setStreet("");
+      setCity("");
+      setState("");
+      setPostalCode("");
     } catch {
       setMessage("Error create events");
     }
@@ -128,14 +148,18 @@ export default function CreateEventPage() {
           <form onSubmit={handleSubmit} className="space-y-8">
             {message && (
               <div
-                className={`p-4 rounded-2xl ${message.includes("success") ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
+                className={`p-4 rounded-2xl ${
+                  message.includes("success")
+                    ? "bg-green-50 text-green-700"
+                    : "bg-red-50 text-red-700"
+                }`}
               >
                 {message}
               </div>
             )}
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                 Title
               </label>
               <input
@@ -150,7 +174,7 @@ export default function CreateEventPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                   Date
                 </label>
                 <div className="relative">
@@ -179,7 +203,7 @@ export default function CreateEventPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                   Start Time
                 </label>
                 <input
@@ -192,7 +216,7 @@ export default function CreateEventPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                   End Time
                 </label>
                 <input
@@ -206,7 +230,67 @@ export default function CreateEventPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4">
+              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                Location
+              </label>
+              <div className="mb-4">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  Street
+                </label>
+                <input
+                  type="text"
+                  value={street}
+                  onChange={(e) => setStreet(e.target.value)}
+                  placeholder="e.g. 123 Main Street"
+                  className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="e.g. Vancouver"
+                    className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                    State
+                  </label>
+                  <input
+                    type="text"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    placeholder="e.g. BC"
+                    className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="max-w-1/3">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  Postal Code
+                </label>
+                <input
+                  type="text"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  placeholder="e.g. A1B 2C3"
+                  className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-4">
                 Upload Cover Images
               </label>
 
@@ -233,7 +317,7 @@ export default function CreateEventPage() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                 Description
               </label>
               <textarea

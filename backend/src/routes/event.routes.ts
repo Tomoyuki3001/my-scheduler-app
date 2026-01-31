@@ -5,6 +5,7 @@ import { authenticate } from "../middleware/auth.middleware";
 const router = express.Router();
 
 router.get("/", EventController.getEvent);
+router.get("/:id", EventController.getEventDetails);
 
 router.use(authenticate);
 

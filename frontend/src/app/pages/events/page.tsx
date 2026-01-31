@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import EditEventModal from "../../../components/EditEventModal";
 import EventCard from "../../../components/EventCard";
+
 interface EventType {
   _id: string;
   userId: string;
@@ -10,17 +10,16 @@ interface EventType {
   description?: string;
   start: string;
   end: string;
+  location: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+  };
 }
 
 export default function EventListPage() {
   const [events, setEvents] = useState<EventType[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<EventType | null>(null);
-
-  const handleEditClick = (event: EventType) => {
-    setSelectedEvent(event);
-    setIsModalOpen(true);
-  };
 
   useEffect(() => {
     fetch("http://localhost:5000/api/events", {
@@ -33,35 +32,8 @@ export default function EventListPage() {
       .catch(() => setEvents([]));
   }, []);
 
-  const handleUpdate = async (event: EventType) => {
-    try {
-      const res = await fetch(`http://localhost:5000/api/events/${event._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(event),
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to update");
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this event?")) {
-      return;
-    }
-
-    await fetch(`http://localhost:5000/api/events/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-    setEvents(events.filter((event) => event._id !== id));
+  const handleSearch = () => {
+    console.log("search");
   };
 
   return (
@@ -101,14 +73,14 @@ export default function EventListPage() {
               <option value="month">This Month</option>
               <option value="upcoming">Upcoming</option>
             </select>
-
-            <select className="px-4 py-2.5 border border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer">
-              <option value="date">Sort by Date</option>
-              <option value="title">Sort by Title</option>
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-            </select>
           </div>
+
+          <button
+            onClick={handleSearch}
+            className="px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            Search
+          </button>
         </div>
       </div>
 
@@ -117,15 +89,6 @@ export default function EventListPage() {
           return <EventCard key={event._id} event={event} />;
         })}
       </div>
-
-      {selectedEvent && (
-        <EditEventModal
-          event={selectedEvent}
-          onSave={handleUpdate}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
     </div>
   );
 }

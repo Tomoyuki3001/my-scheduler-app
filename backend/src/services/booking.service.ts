@@ -18,7 +18,7 @@ export const bookingService = {
     }
 
     const validatedBookingData = createBookingSchema.safeParse({
-      eventId: req.body.eventId,
+      eventId: req.params.eventId,
       userId: req.userId,
       status: req.body.status,
       bookedDate: req.body.bookedDate,
@@ -45,14 +45,17 @@ export const bookingService = {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const { id } = req.params;
-    if (!id) {
+    const { bookingId } = req.params;
+    if (!bookingId) {
       return null;
     }
-
-    return await Booking.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    return await Booking.findByIdAndUpdate(
+      bookingId,
+      { status: req.body.status },
+      {
+        new: true,
+      }
+    );
   },
 
   async deleteBooking(req: Request, res: Response) {
@@ -65,5 +68,25 @@ export const bookingService = {
       return null;
     }
     return await Booking.findByIdAndDelete(id);
+  },
+
+  async getBookingDetails(req: Request, res: Response) {
+    if (!req.userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { eventId } = req.params;
+    if (!eventId) {
+      return null;
+    }
+    const booking = await Booking.findOne({
+      eventId,
+      userId: req.userId,
+      status: "booked",
+    }).sort({ createdAt: -1 });
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+    return booking;
   },
 };

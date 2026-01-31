@@ -197,9 +197,7 @@ export class UserController {
         return;
       }
 
-      const user = await User.findById(decoded.userId).select(
-        "-password -verificationToken -verificationTokenExpires"
-      );
+      const user = await User.findById(decoded.userId);
 
       if (!user) {
         res.status(404).json({

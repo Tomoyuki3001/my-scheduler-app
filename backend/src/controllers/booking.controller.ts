@@ -72,4 +72,20 @@ export class BookingController {
       });
     }
   };
+
+  static getBookingDetails = async (req: Request, res: Response) => {
+    try {
+      const result = await bookingService.getBookingDetails(req, res);
+      res.status(200).json({
+        status: "success",
+        message: "Booking details fetched successfully",
+        data: result,
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        status: "Exception",
+        message: error.message,
+      });
+    }
+  };
 }
