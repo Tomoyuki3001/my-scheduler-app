@@ -5,7 +5,7 @@ import EventCard from "../../../components/EventCard";
 
 export default function page() {
   return (
-    <section className="max-w-7xl mx-auto px-4 py-16">
+    <section className="max-w-7xl mx-auto px-4 py-8">
       <div className="flex justify-between items-end mb-8">
         <div>
           <h2 className="text-3xl font-bold text-slate-900">Upcoming Events</h2>
@@ -21,7 +21,6 @@ export default function page() {
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <EventCard />
         <EventCard />
         <EventCard />
       </div>

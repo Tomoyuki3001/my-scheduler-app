@@ -31,7 +31,7 @@ export default function LoginPage() {
       }
 
       window.dispatchEvent(new Event("auth-status-changed"));
-      router.push("/pages/profile");
+      router.push("/pages/events");
     } catch (err) {
       console.log("Login error:", err);
       setErrorMessage((err as Error).message || "Login failed");

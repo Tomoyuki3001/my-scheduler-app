@@ -20,31 +20,31 @@ export default function Page() {
   const [deleteModal, setDeleteModal] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/users/profile", {
-      credentials: "include",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          if (res.status === 401) {
-            router.push("/pages/auth/login");
-            return;
+    const fetchProfile = async () => {
+      await fetch("http://localhost:5000/api/users/me", {
+        credentials: "include",
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            if (res.status === 401) {
+              router.push("/pages/auth/login");
+              return;
+            }
+            throw new Error("Failed to fetch profile");
           }
-          throw new Error("Failed to fetch profile");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data.status === "success") {
+          const data = await res.json();
+          console.log("data", data);
           setProfile(data.data);
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching profile:", err);
-        router.push("/pages/auth/login");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+        })
+        .catch((err) => {
+          console.error("Error fetching profile:", err);
+          router.push("/pages/auth/login");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    };
+    fetchProfile();
   }, [router]);
 
   const handleLogout = async () => {
@@ -58,7 +58,7 @@ export default function Page() {
 
   const handleEditProfile = async () => {
     try {
-      await fetch(`http://localhost:5000/api/users/profile/${profile?.id}`, {
+      await fetch(`http://localhost:5000/api/users/${profile?.id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -81,11 +81,11 @@ export default function Page() {
   const handleDeleteProfile = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/users/profile/${profile?.id}`,
+        `http://localhost:5000/api/users/${profile?.id}`,
         {
           method: "DELETE",
           credentials: "include",
-        },
+        }
       );
       if (!res.ok) {
         throw new Error("Failed to delete profile");
@@ -104,6 +104,8 @@ export default function Page() {
   if (!profile) {
     return null;
   }
+
+  console.log("profile", profile);
 
   return (
     <div className="min-h-screen bg-slate-50">
