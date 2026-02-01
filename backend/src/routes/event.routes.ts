@@ -12,5 +12,6 @@ router.use(authenticate);
 router.post("/", EventController.createEvent);
 router.put("/:id", EventController.updateEvent);
 router.delete("/:id", EventController.deleteEvent);
+router.get("/created/:userId", EventController.getCreatedEvent);
 
 export default router;
