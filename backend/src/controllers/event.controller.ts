@@ -20,6 +20,7 @@ export class EventController {
       const userId = (req as any).userId;
 
       const validatedData = createEventSchema.safeParse({
+        userId,
         title,
         description,
         start,
@@ -39,12 +40,12 @@ export class EventController {
       }
 
       const newEvent = await Event.create({
+        userId,
         title,
         description,
         start,
         end,
         location,
-        userId,
       });
       res.status(200).json(newEvent);
     } catch (err: any) {
@@ -95,6 +96,26 @@ export class EventController {
       });
     } catch (err: any) {
       res.status(500).json({ status: "Exception", message: err.message });
+    }
+  }
+
+  static async getCreatedEvent(req: Request, res: Response) {
+    try {
+      const events = await Event.find({
+        userId: req.params.userId,
+        start: { $gt: new Date() },
+      }).sort({ start: 1 });
+
+      res.status(200).json({
+        status: "success",
+        message: "Events fetched successfully",
+        data: events,
+      });
+    } catch (err: any) {
+      res.status(500).json({
+        status: "Exception",
+        message: err.message ?? "Internal server error",
+      });
     }
   }
 }
