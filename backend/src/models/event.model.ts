@@ -13,6 +13,7 @@ const eventSchema = new Schema(
       state: { type: String, required: true, trim: true },
       postalCode: { type: String, required: true, trim: true },
     },
+    image: { type: String, required: false, default: null, trim: true },
   },
   { timestamps: true }
 );

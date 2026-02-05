@@ -15,8 +15,14 @@ export class EventController {
 
   static async createEvent(req: Request, res: Response): Promise<void> {
     try {
-      const { title, description, start, end, location }: InterfaceEventInput =
-        req.body;
+      const {
+        title,
+        description,
+        start,
+        end,
+        location,
+        image,
+      }: InterfaceEventInput = req.body;
       const userId = (req as any).userId;
 
       const validatedData = createEventSchema.safeParse({
@@ -26,6 +32,7 @@ export class EventController {
         start,
         end,
         location,
+        image,
       });
       if (!validatedData.success) {
         res.status(400).json({
@@ -46,6 +53,7 @@ export class EventController {
         start,
         end,
         location,
+        image,
       });
       res.status(200).json(newEvent);
     } catch (err: any) {

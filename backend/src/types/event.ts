@@ -11,4 +11,5 @@ export interface InterfaceEventInput {
   start: string;
   end: string;
   location: EventLocation;
+  image: string;
 }

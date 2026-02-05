@@ -108,7 +108,7 @@ export default function Page(params: { params: { id: string } }) {
     <div className="max-w-2xl my-10 mx-auto bg-gray-100 min-h-screen shadow-sm pb-10">
       <div className="relative h-64 md:h-80 w-full overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+          src="https://img.freepik.com/free-vector/happy-tiny-business-people-dancing-having-fun-drinking-wine-corporate-party-team-building-activity-corporate-event-idea-concept-pinkish-coral-bluevector-isolated-illustration_335657-1414.jpg?semt=ais_hybrid&w=740"
           alt="Event Header"
           className="w-full h-full object-cover"
         />
