@@ -28,14 +28,14 @@ export const createEventSchema = z
       .datetime()
       .refine(
         (date) => new Date(date) >= new Date(),
-        "Start date cannot be in the past",
+        "Start date cannot be in the past"
       ),
     end: z
       .string()
       .datetime()
       .refine(
         (date) => new Date(date) >= new Date(),
-        "End date cannot be in the past",
+        "End date cannot be in the past"
       ),
     location: locationSchema,
     image: z.string().optional(),
@@ -45,4 +45,13 @@ export const createEventSchema = z
     path: ["end"],
   });
 
+export const updateEventSchema = createEventSchema.refine(
+  (data) => new Date(data.end ?? "") > new Date(data.start ?? ""),
+  {
+    message: "End date/time should be after start date/time",
+    path: ["end"],
+  }
+);
+
 export type CreateEventInput = z.infer<typeof createEventSchema>;
+export type UpdateEventInput = z.infer<typeof updateEventSchema>;

@@ -499,7 +499,7 @@ export default function Page() {
                   </Link>
                   <div className="shrink-0 flex gap-2">
                     <Link
-                      href={`/pages/events/${item._id}`}
+                      href={`/pages/events/update/${item._id}`}
                       className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                     >
                       Edit
