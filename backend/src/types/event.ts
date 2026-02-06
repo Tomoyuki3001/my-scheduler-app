@@ -7,6 +7,7 @@ export interface EventLocation {
 
 export interface InterfaceEventInput {
   title: string;
+  category: string;
   description: string;
   start: string;
   end: string;

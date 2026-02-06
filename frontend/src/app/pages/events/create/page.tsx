@@ -7,6 +7,7 @@ import Image from "next/image";
 export default function CreateEventPage() {
   const router = useRouter();
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -24,6 +25,7 @@ export default function CreateEventPage() {
 
   const hasUnsavedChanges =
     title ||
+    category ||
     description ||
     eventDate ||
     startTime ||
@@ -43,13 +45,13 @@ export default function CreateEventPage() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}-${String(d.getDate()).padStart(2, "0")}`;
   })();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    e.target.value = ""; // reset so same file can be selected again
+    e.target.value = "";
     setUploadError(null);
     if (!file) return;
 
@@ -60,12 +62,11 @@ export default function CreateEventPage() {
         {
           method: "GET",
           credentials: "include",
-        }
+        },
       );
       if (!response.ok) throw new Error("Failed to get upload signature");
 
       const { signature, timestamp, apiKey, cloudName } = await response.json();
-      console.log(signature, timestamp, apiKey, cloudName);
       const formData = new FormData();
       formData.append("file", file);
       formData.append("signature", signature);
@@ -78,7 +79,7 @@ export default function CreateEventPage() {
         {
           method: "POST",
           body: formData,
-        }
+        },
       );
 
       if (!uploadResponse.ok) {
@@ -152,6 +153,7 @@ export default function CreateEventPage() {
         credentials: "include",
         body: JSON.stringify({
           title,
+          category,
           description,
           start,
           end,
@@ -171,6 +173,7 @@ export default function CreateEventPage() {
 
       setMessage("Event created successfully!");
       setTitle("");
+      setCategory("");
       setDescription("");
       setEventDate("");
       setStartTime("");
@@ -227,6 +230,26 @@ export default function CreateEventPage() {
                 className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
                 required
               />
+            </div>
+            <div>
+              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                Category
+              </label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-1/3 border border-slate-200 rounded-2xl p-4 text-sm bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              >
+                <option value="" disabled selected>
+                  Select a category
+                </option>
+                <option value="concerts">Concerts</option>
+                <option value="sports">Sports</option>
+                <option value="comedy">Comedy</option>
+                <option value="music-shows">Music & Shows</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -1,20 +1,6 @@
 import { Request, Response } from "express";
 import { bookingService } from "../services/booking.service";
 
-/** Send a single response; use for error handling so we never double-send */
-function sendError(res: Response, error: unknown) {
-  const err = error as { statusCode?: number; message?: string; body?: object };
-  const status = err.statusCode ?? 500;
-  const body =
-    err.body != null
-      ? { status: "error", message: err.message, ...err.body }
-      : {
-          status: "Exception",
-          message: err.message ?? "Internal server error",
-        };
-  res.status(status).json(body);
-}
-
 export class BookingController {
   static getBooking = async (req: Request, res: Response) => {
     try {
@@ -24,8 +10,8 @@ export class BookingController {
         message: "Booking fetched successfully",
         data: result,
       });
-    } catch (error) {
-      sendError(res, error);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -37,8 +23,8 @@ export class BookingController {
         message: "Booking created successfully",
         data: result,
       });
-    } catch (error) {
-      sendError(res, error);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -54,8 +40,8 @@ export class BookingController {
         message: "Booking updated successfully",
         data: result,
       });
-    } catch (error) {
-      sendError(res, error);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -70,8 +56,8 @@ export class BookingController {
         status: "success",
         message: "Booking deleted successfully",
       });
-    } catch (error) {
-      sendError(res, error);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -87,8 +73,8 @@ export class BookingController {
         message: "Booking details fetched successfully",
         data: result,
       });
-    } catch (error) {
-      sendError(res, error);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -100,8 +86,8 @@ export class BookingController {
         message: "Booking fetched successfully",
         data: result,
       });
-    } catch (error) {
-      sendError(res, error);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   };
 }
