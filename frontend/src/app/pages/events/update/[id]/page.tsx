@@ -402,33 +402,6 @@ export default function UpdateEventPage() {
             </div>
 
             <div>
-              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-4">
-                Upload Cover Images
-              </label>
-
-              <div className="border-2 border-dashed border-blue-100 rounded-3xl p-12 flex flex-col items-center justify-center bg-blue-50/20 group hover:border-[#1d63ed] transition-all cursor-pointer">
-                <div className="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                  <svg
-                    className="w-8 h-8 text-[#1d63ed]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                </div>
-                <p className="text-sm font-medium text-blue-600">
-                  You can also drop your files here
-                </p>
-              </div>
-            </div>
-
-            <div>
               <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                 Description
               </label>
