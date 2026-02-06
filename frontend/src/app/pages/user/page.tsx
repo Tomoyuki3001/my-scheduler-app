@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface UserProfile {
   id: string;
@@ -11,6 +12,43 @@ interface UserProfile {
   isVerified: boolean;
 }
 
+interface BookedItem {
+  _id: string;
+  eventId: string;
+  userId: string;
+  status: string;
+  bookedDate: string;
+  createdAt: string;
+  event: {
+    _id: string;
+    title: string;
+    description: string;
+    start: string;
+    end: string;
+    location?: {
+      street: string;
+      city: string;
+      state: string;
+      postalCode: string;
+    };
+  };
+}
+
+interface MyEventItem {
+  _id: string;
+  title: string;
+  category: string;
+  description: string;
+  start: string;
+  end: string;
+  location?: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+  };
+}
+
 export default function Page() {
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -18,6 +56,10 @@ export default function Page() {
   const [editProfile, setEditProfile] = useState(false);
   const [deleteProfile, setDeleteProfile] = useState(false);
   const [deleteModal, setDeleteModal] = useState(false);
+  const [bookedList, setBookedList] = useState<BookedItem[]>([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
+  const [myEventsList, setMyEventsList] = useState<MyEventItem[]>([]);
+  const [loadingMyEvents, setLoadingMyEvents] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -33,7 +75,6 @@ export default function Page() {
             throw new Error("Failed to fetch profile");
           }
           const data = await res.json();
-          console.log("data", data);
           setProfile(data.data);
         })
         .catch((err) => {
@@ -47,6 +88,51 @@ export default function Page() {
     fetchProfile();
   }, [router]);
 
+  useEffect(() => {
+    if (!profile?.id) return;
+    const fetchBookings = async () => {
+      setLoadingBookings(true);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/bookings/user/${profile.id}`,
+          { credentials: "include" },
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setBookedList(data.data ?? []);
+        }
+      } catch (err) {
+        console.error("Error fetching bookings:", err);
+      } finally {
+        setLoadingBookings(false);
+      }
+    };
+    fetchBookings();
+  }, [profile?.id]);
+
+  useEffect(() => {
+    if (!profile?.id) return;
+    const fetchMyEvents = async () => {
+      setLoadingMyEvents(true);
+      try {
+        const res = await fetch(
+          `http://localhost:5000/api/events/created/${profile.id}`,
+          { credentials: "include" },
+        );
+        console.log("res", res);
+        if (res.ok) {
+          const data = await res.json();
+          setMyEventsList(data.data ?? []);
+        }
+      } catch (err) {
+        console.error("Error fetching my events:", err);
+      } finally {
+        setLoadingMyEvents(false);
+      }
+    };
+    fetchMyEvents();
+  }, [profile?.id]);
+
   const handleLogout = async () => {
     await fetch("http://localhost:5000/api/users/logout", {
       method: "POST",
@@ -54,6 +140,21 @@ export default function Page() {
     });
     window.dispatchEvent(new Event("auth-status-changed"));
     router.push("/");
+  };
+
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!confirm("Are you sure you want to delete this event?")) return;
+    try {
+      const res = await fetch(`http://localhost:5000/api/events/${eventId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to delete event");
+      setMyEventsList((prev) => prev.filter((e) => e._id !== eventId));
+    } catch (err) {
+      console.error("Error deleting event:", err);
+      alert("Failed to delete event. Please try again.");
+    }
   };
 
   const handleEditProfile = async () => {
@@ -85,7 +186,7 @@ export default function Page() {
         {
           method: "DELETE",
           credentials: "include",
-        }
+        },
       );
       if (!res.ok) {
         throw new Error("Failed to delete profile");
@@ -101,11 +202,24 @@ export default function Page() {
     }
   };
 
+  const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const formatTime = (time: string) => {
+    return new Date(time).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   if (!profile) {
     return null;
   }
-
-  console.log("profile", profile);
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -306,6 +420,102 @@ export default function Page() {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-8 bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">
+            My Bookings
+          </h2>
+
+          {loadingBookings ? (
+            <div className="py-12 text-center text-slate-500">
+              Loading bookings...
+            </div>
+          ) : bookedList.length === 0 ? (
+            <div className="py-12 text-center text-slate-500 rounded-xl bg-slate-50">
+              No upcoming booked events.
+            </div>
+          ) : (
+            <ul className="space-y-3">
+              {bookedList.map((item) => (
+                <li key={item._id}>
+                  <Link
+                    href={`/pages/events/${item.event._id}`}
+                    className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-blue-200 hover:bg-blue-50/50 transition-colors"
+                  >
+                    <div className="min-w-0">
+                      <span className="font-semibold text-slate-900 truncate block">
+                        {item.event?.title ?? "Event"}
+                      </span>
+                      <p className="text-sm text-slate-500 mt-1">
+                        <span className="mr-2">
+                          {formatDate(item.event?.start)}
+                        </span>{" "}
+                        {item.event?.start
+                          ? `${formatTime(item.event.start)}`
+                          : ""}
+                        {item.event?.end
+                          ? ` ~ ${formatTime(item.event.end)}`
+                          : ""}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-sm font-medium text-blue-600">
+                      View event →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="mt-8 bg-white rounded-2xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">My Events</h2>
+
+          {loadingMyEvents ? (
+            <div className="py-12 text-center text-slate-500">
+              Loading events...
+            </div>
+          ) : myEventsList.length === 0 ? (
+            <div className="py-12 text-center text-slate-500 rounded-xl bg-slate-50">
+              No upcoming events you created.
+            </div>
+          ) : (
+            <ul className="space-y-3">
+              {myEventsList.map((item) => (
+                <li
+                  key={item._id}
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-slate-200 transition-colors"
+                >
+                  <Link href={`/pages/events/${item._id}`} className="min-w-0">
+                    <span className="font-semibold text-slate-900 truncate block hover:text-blue-600">
+                      {item.title}
+                    </span>
+                    <p className="text-sm text-slate-500 mt-1">
+                      <span className="mr-2">{formatDate(item.start)}</span>
+                      {item.start ? `${formatTime(item.start)}` : ""}
+                      {item.end ? ` ~ ${formatTime(item.end)}` : ""}
+                    </p>
+                  </Link>
+                  <div className="shrink-0 flex gap-2">
+                    <Link
+                      href={`/pages/events/update/${item._id}`}
+                      className="px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteEvent(item._id)}
+                      className="px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </div>

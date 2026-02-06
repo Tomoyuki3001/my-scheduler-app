@@ -1,13 +1,29 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
 
-export default function CreateEventPage() {
+interface Event {
+  _id: string;
+  userId: string;
+  title: string;
+  description?: string;
+  start: string;
+  end: string;
+  location: {
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+  };
+}
+
+export default function UpdateEventPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = params.id as string;
+
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -18,14 +34,10 @@ export default function CreateEventPage() {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [postalCode, setPostalCode] = useState("");
-  const [image, setImage] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [events, setEvents] = useState<Event | null>(null);
 
   const hasUnsavedChanges =
     title ||
-    category ||
     description ||
     eventDate ||
     startTime ||
@@ -41,62 +53,28 @@ export default function CreateEventPage() {
     return dateTime.toISOString();
   };
 
+  const isoToDateInput = (iso: string): string => {
+    const d = new Date(iso);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+      2,
+      "0"
+    )}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+
+  const isoToTimeInput = (iso: string): string => {
+    const d = new Date(iso);
+    return `${String(d.getHours()).padStart(2, "0")}:${String(
+      d.getMinutes()
+    ).padStart(2, "0")}`;
+  };
+
   const today = (() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
       2,
-      "0",
+      "0"
     )}-${String(d.getDate()).padStart(2, "0")}`;
   })();
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    setUploadError(null);
-    if (!file) return;
-
-    setUploading(true);
-    try {
-      const response = await fetch(
-        "http://localhost:5000/api/upload/get-signature",
-        {
-          method: "GET",
-          credentials: "include",
-        },
-      );
-      if (!response.ok) throw new Error("Failed to get upload signature");
-
-      const { signature, timestamp, apiKey, cloudName } = await response.json();
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("signature", signature);
-      formData.append("timestamp", String(timestamp));
-      formData.append("api_key", apiKey);
-      formData.append("folder", "timeflow_events");
-
-      const uploadResponse = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-
-      if (!uploadResponse.ok) {
-        throw new Error("Failed to upload file to Cloudinary");
-      }
-
-      const uploadData: { secure_url?: string } = await uploadResponse.json();
-      const url = uploadData.secure_url ?? null;
-      setImage(url);
-    } catch (error) {
-      console.error("Error uploading file:", error);
-      setUploadError(error instanceof Error ? error.message : "Upload failed");
-      setImage(null);
-    } finally {
-      setUploading(false);
-    }
-  };
 
   const handleCancel = () => {
     if (hasUnsavedChanges) {
@@ -119,17 +97,9 @@ export default function CreateEventPage() {
     e.preventDefault();
     setMessage("");
 
-    const start = combineDateTime(eventDate, startTime);
-    const end = combineDateTime(eventDate, endTime);
-
-    if (!start || !end) {
-      setMessage("Please select both date and times");
-      return;
-    }
-
     const now = new Date();
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    const startDate = new Date(events?.start ?? "");
+    const endDate = new Date(events?.end ?? "");
 
     if (startDate < now) {
       setMessage("Start date and time cannot be in the past");
@@ -144,49 +114,104 @@ export default function CreateEventPage() {
       return;
     }
 
+    if (!title) {
+      setMessage("Title is required");
+      return;
+    }
+    if (!eventDate) {
+      setMessage("Date is required");
+      return;
+    }
+    if (!startTime) {
+      setMessage("Start time is required");
+      return;
+    }
+    if (!endTime) {
+      setMessage("End time is required");
+      return;
+    }
+    if (!street) {
+      setMessage("Street is required");
+      return;
+    }
+    if (!city) {
+      setMessage("City is required");
+      return;
+    }
+    if (!state) {
+      setMessage("State is required");
+      return;
+    }
+    if (!postalCode) {
+      setMessage("Postal code is required");
+      return;
+    }
+    if (!description) {
+      setMessage("Description is required");
+      return;
+    }
+
     try {
-      const res = await fetch("http://localhost:5000/api/events", {
-        method: "POST",
+      const res = await fetch(`http://localhost:5000/api/events/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
         body: JSON.stringify({
           title,
-          category,
           description,
-          start,
-          end,
-          location: { street, city, state, postalCode },
-          ...(image ? { image } : {}),
+          start: combineDateTime(eventDate, startTime),
+          end: combineDateTime(eventDate, endTime),
+          location: {
+            street,
+            city,
+            state,
+            postalCode,
+          },
         }),
       });
-
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        const fieldErrors = data?.details?.fieldErrors;
-        if (fieldErrors?.start?.length) setMessage(fieldErrors.start[0]);
-        else if (fieldErrors?.end?.length) setMessage(fieldErrors.end[0]);
-        else setMessage(data?.message ?? "Failed to create event");
+        const data = await res.json();
+        setMessage(data.error);
         return;
       }
-
-      setMessage("Event created successfully!");
-      setTitle("");
-      setCategory("");
-      setDescription("");
-      setEventDate("");
-      setStartTime("");
-      setEndTime("");
-      setStreet("");
-      setCity("");
-      setState("");
-      setPostalCode("");
-      setImage(null);
-    } catch {
-      setMessage("Error create events");
+      setMessage("Event updated successfully");
+      router.push("/pages/events");
+    } catch (err: unknown) {
+      setMessage(
+        `Failed to update event: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`
+      );
+      return;
     }
   };
+
+  useEffect(() => {
+    fetch(`http://localhost:5000/api/events/${id}`, {
+      credentials: "include",
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setEvents(data.data as Event);
+        setTitle(data.data.title);
+        setDescription(data.data.description ?? "");
+        setEventDate(isoToDateInput(data.data.start));
+        setStartTime(isoToTimeInput(data.data.start));
+        setEndTime(isoToTimeInput(data.data.end));
+        setStreet(data.data.location.street);
+        setCity(data.data.location.city);
+        setState(data.data.location.state);
+        setPostalCode(data.data.location.postalCode);
+      })
+      .catch((err) => {
+        console.log("Error fetching events", err);
+        setEvents(null);
+      });
+  }, [id]);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
@@ -194,7 +219,7 @@ export default function CreateEventPage() {
         <div className="w-full max-w-4xl bg-white rounded-3xl shadow-sm border border-slate-100 p-10">
           <div className="flex justify-between items-center mb-10">
             <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-              Create new event
+              Update event
             </h1>
             <button
               type="button"
@@ -230,26 +255,6 @@ export default function CreateEventPage() {
                 className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
                 required
               />
-            </div>
-            <div>
-              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
-                Category
-              </label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-1/3 border border-slate-200 rounded-2xl p-4 text-sm bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                required
-              >
-                <option value="" disabled selected>
-                  Select a category
-                </option>
-                <option value="concerts">Concerts</option>
-                <option value="sports">Sports</option>
-                <option value="comedy">Comedy</option>
-                <option value="music-shows">Music & Shows</option>
-                <option value="other">Other</option>
-              </select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -371,83 +376,31 @@ export default function CreateEventPage() {
 
             <div>
               <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-4">
-                Upload Cover Images(Optional)
+                Upload Cover Images
               </label>
 
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={() => fileInputRef.current?.click()}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    fileInputRef.current?.click();
-                  }
-                }}
-                className="border-2 border-dashed border-blue-100 rounded-3xl p-12 flex flex-col items-center justify-center bg-blue-50/20 group hover:border-[#1d63ed] transition-all cursor-pointer"
-              >
-                <input
-                  type="file"
-                  accept="image/*"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  className="hidden"
-                  disabled={uploading}
-                />
-                {image ? (
-                  <>
-                    <div className="relative w-20 h-20 rounded-xl bg-slate-100 mb-3 overflow-hidden">
-                      <Image
-                        src={image}
-                        alt="Cover"
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
-                    <p className="text-sm font-medium text-green-600 mb-1">
-                      Cover image added
-                    </p>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setImage(null);
-                      }}
-                      className="text-xs text-slate-500 hover:text-red-600"
-                    >
-                      Remove
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <div className="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                      <svg
-                        className="w-8 h-8 text-[#1d63ed]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                        />
-                      </svg>
-                    </div>
-                    <p className="text-sm font-medium text-blue-600">
-                      {uploading
-                        ? "Uploading…"
-                        : "Click or drop an image to upload"}
-                    </p>
-                  </>
-                )}
+              <div className="border-2 border-dashed border-blue-100 rounded-3xl p-12 flex flex-col items-center justify-center bg-blue-50/20 group hover:border-[#1d63ed] transition-all cursor-pointer">
+                <div className="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                  <svg
+                    className="w-8 h-8 text-[#1d63ed]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                </div>
+                <p className="text-sm font-medium text-blue-600">
+                  You can also drop your files here
+                </p>
               </div>
-              {uploadError && (
-                <p className="mt-2 text-sm text-red-600">{uploadError}</p>
-              )}
             </div>
+
             <div>
               <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
                 Description
@@ -471,7 +424,7 @@ export default function CreateEventPage() {
                 type="submit"
                 className="w-full bg-[#1d63ed] hover:bg-blue-700 text-white font-bold py-5 rounded-3xl shadow-xl shadow-blue-200 transition-all transform hover:-translate-y-1 active:scale-95"
               >
-                Create event
+                Update event
               </button>
             </div>
           </form>

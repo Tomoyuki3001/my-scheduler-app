@@ -7,6 +7,7 @@ import CancelBookingModal from "../../../../components/CancelBookingModal";
 interface Event {
   _id: string;
   title: string;
+  category: string;
   description: string;
   start: string;
   end: string;
@@ -61,7 +62,7 @@ export default function Page(params: { params: { id: string } }) {
     if (!event?._id) return;
     const response = await fetch(
       `http://localhost:5000/api/bookings/${event._id}`,
-      { credentials: "include" }
+      { credentials: "include" },
     );
     const data = await response.json();
     if (response.ok && data.data) {
@@ -108,7 +109,7 @@ export default function Page(params: { params: { id: string } }) {
     <div className="max-w-2xl my-10 mx-auto bg-gray-100 min-h-screen shadow-sm pb-10">
       <div className="relative h-64 md:h-80 w-full overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+          src="https://img.freepik.com/free-vector/happy-tiny-business-people-dancing-having-fun-drinking-wine-corporate-party-team-building-activity-corporate-event-idea-concept-pinkish-coral-bluevector-isolated-illustration_335657-1414.jpg?semt=ais_hybrid&w=740"
           alt="Event Header"
           className="w-full h-full object-cover"
         />
@@ -120,11 +121,18 @@ export default function Page(params: { params: { id: string } }) {
         </p>
       </div>
 
-      <div className="px-6 py-8">
+      <div className="px-6 mt-2">
+        <label className="text-slate-500 text-md mb-2">Category:</label>
+        <p className="w-fit text-sm tracking-wide bg-blue-500 text-white px-4 py-2 rounded-full">
+          {event?.category}
+        </p>
+      </div>
+
+      <div className="px-6 mt-4">
         <div className="flex justify-between items-start">
           <div>
             <div className="mb-4">
-              <label className="text-slate-500 text-md mb-2">Event Date:</label>
+              <label className="text-slate-500 text-md mb-2">Date:</label>
               <p className="text-slate-900 font-bold text-md tracking-wide">
                 {formatDate(event?.start)} <br />
                 {formatTime(event?.start)} - {formatTime(event?.end)}
@@ -134,18 +142,16 @@ export default function Page(params: { params: { id: string } }) {
         </div>
 
         <div>
-          <label className="text-slate-500 text-md mb-2">Event Location:</label>
+          <label className="text-slate-500 text-md mb-2">Location:</label>
           <p className="text-slate-900 text-md tracking-wide">
-            {event?.location.street}, {event?.location.city},
-            {event?.location.state} <br />
+            {event?.location.street} <br />
+            {event?.location.city}, {event?.location.state} <br />
             {event?.location.postalCode}
           </p>
         </div>
 
         <div className="my-4 text-slate-500 leading-relaxed max-w-2xl tracking-wide">
-          <label className="text-slate-500 text-md mb-2 ">
-            Event Description:
-          </label>
+          <label className="text-slate-500 text-md mb-2 ">Description:</label>
           <p className="text-slate-900 text-md tracking-wide">
             {event?.description}
           </p>

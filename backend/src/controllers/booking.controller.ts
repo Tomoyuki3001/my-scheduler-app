@@ -11,10 +11,7 @@ export class BookingController {
         data: result,
       });
     } catch (error: any) {
-      res.status(500).json({
-        status: "Exception",
-        message: error.message,
-      });
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -27,10 +24,7 @@ export class BookingController {
         data: result,
       });
     } catch (error: any) {
-      res.status(500).json({
-        status: "Exception",
-        message: error.message,
-      });
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -47,10 +41,7 @@ export class BookingController {
         data: result,
       });
     } catch (error: any) {
-      res.status(500).json({
-        status: "Exception",
-        message: error.message,
-      });
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -66,26 +57,37 @@ export class BookingController {
         message: "Booking deleted successfully",
       });
     } catch (error: any) {
-      res.status(500).json({
-        status: "Exception",
-        message: error.message,
-      });
+      res.status(500).json({ error: error.message });
     }
   };
 
   static getBookingDetails = async (req: Request, res: Response) => {
     try {
       const result = await bookingService.getBookingDetails(req, res);
+      if (!result) {
+        res.status(404).json({ message: "Booking not found" });
+        return;
+      }
       res.status(200).json({
         status: "success",
         message: "Booking details fetched successfully",
         data: result,
       });
     } catch (error: any) {
-      res.status(500).json({
-        status: "Exception",
-        message: error.message,
+      res.status(500).json({ error: error.message });
+    }
+  };
+
+  static getUserBooking = async (req: Request, res: Response) => {
+    try {
+      const result = await bookingService.getUserBooking(req, res);
+      res.status(200).json({
+        status: "success",
+        message: "Booking fetched successfully",
+        data: result,
       });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
     }
   };
 }

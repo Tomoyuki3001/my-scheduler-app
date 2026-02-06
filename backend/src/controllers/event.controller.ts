@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
-import Event from "../models/event.model";
-import { createEventSchema } from "../../../shared/schemas/event.schema";
-import { InterfaceEventInput } from "../types/event";
+import { eventService } from "../services/event.service";
 
 export class EventController {
   static async getEvent(req: Request, res: Response): Promise<void> {
     try {
-      const events = await Event.find();
+      const events = await eventService.getEvent(req, res);
       res.status(200).json(events);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -15,56 +13,17 @@ export class EventController {
 
   static async createEvent(req: Request, res: Response): Promise<void> {
     try {
-      const { title, description, start, end, location }: InterfaceEventInput =
-        req.body;
-      const userId = (req as any).userId;
-
-      const validatedData = createEventSchema.safeParse({
-        title,
-        description,
-        start,
-        end,
-        location,
-      });
-      if (!validatedData.success) {
-        res.status(400).json({
-          status: "error",
-          message: "Validation failed",
-          details: {
-            fieldErrors: validatedData.error.flatten().fieldErrors,
-            formErrors: validatedData.error.flatten().formErrors,
-          },
-        });
-        return;
-      }
-
-      const newEvent = await Event.create({
-        title,
-        description,
-        start,
-        end,
-        location,
-        userId,
-      });
-      res.status(200).json(newEvent);
+      const events = await eventService.createEvent(req, res);
+      res.status(200).json(events);
     } catch (err: any) {
-      res.status(500).json({ error: err });
+      res.status(500).json({ error: err.message });
     }
   }
 
   static async updateEvent(req: Request, res: Response) {
     try {
-      const updatedEvent = await Event.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-          new: true,
-        }
-      );
-      if (!updatedEvent) {
-        return res.status(404).json({ error: "The event not found" });
-      }
-      res.status(200).json(updatedEvent);
+      const events = await eventService.updateEvent(req, res);
+      res.status(200).json(events);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
     }
@@ -72,27 +31,26 @@ export class EventController {
 
   static async deleteEvent(req: Request, res: Response) {
     try {
-      const deletedEvet = await Event.findByIdAndDelete(req.params.id);
-      if (!deletedEvet) {
-        return res.status(404).json({ error: "The event not found" });
-      }
-      res.status(200).json({ message: "The event deleted successfully!" });
+      const deletedEvet = await eventService.deleteEvent(req, res);
+      res.status(200).json(deletedEvet);
     } catch (err: any) {
-      res.status(500).json({ error: "Failed to delete event" });
+      res.status(500).json({ error: err.message });
     }
   }
 
   static async getEventDetails(req: Request, res: Response) {
     try {
-      const event = await Event.findById(req.params.id);
-      if (!event) {
-        return res.status(404).json({ error: "The event not found" });
-      }
-      res.status(200).json({
-        status: "success",
-        message: "Event fetched successfully",
-        data: event,
-      });
+      const event = await eventService.getEventDetails(req, res);
+      res.status(200).json(event);
+    } catch (err: any) {
+      res.status(500).json({ status: "Exception", message: err.message });
+    }
+  }
+
+  static async getCreatedEvent(req: Request, res: Response) {
+    try {
+      const events = await eventService.getCreatedEvent(req, res);
+      res.status(200).json({ status: "success", data: events });
     } catch (err: any) {
       res.status(500).json({ status: "Exception", message: err.message });
     }
