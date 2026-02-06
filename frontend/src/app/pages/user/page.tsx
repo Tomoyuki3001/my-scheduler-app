@@ -37,6 +37,7 @@ interface BookedItem {
 interface MyEventItem {
   _id: string;
   title: string;
+  category: string;
   description: string;
   start: string;
   end: string;
@@ -94,7 +95,7 @@ export default function Page() {
       try {
         const res = await fetch(
           `http://localhost:5000/api/bookings/user/${profile.id}`,
-          { credentials: "include" }
+          { credentials: "include" },
         );
         if (res.ok) {
           const data = await res.json();
@@ -116,8 +117,9 @@ export default function Page() {
       try {
         const res = await fetch(
           `http://localhost:5000/api/events/created/${profile.id}`,
-          { credentials: "include" }
+          { credentials: "include" },
         );
+        console.log("res", res);
         if (res.ok) {
           const data = await res.json();
           setMyEventsList(data.data ?? []);
@@ -184,7 +186,7 @@ export default function Page() {
         {
           method: "DELETE",
           credentials: "include",
-        }
+        },
       );
       if (!res.ok) {
         throw new Error("Failed to delete profile");

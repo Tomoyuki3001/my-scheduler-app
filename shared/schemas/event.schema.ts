@@ -16,6 +16,10 @@ export const createEventSchema = z
       .string()
       .min(3, "Title too short")
       .max(50, "Title too long must be less than 50 characters"),
+    category: z
+      .string()
+      .min(1, "Category is required")
+      .max(100, "Category too long"),
     description: z
       .string()
       .max(500, "Description too long must be less than 500 characters"),
@@ -34,6 +38,7 @@ export const createEventSchema = z
         "End date cannot be in the past"
       ),
     location: locationSchema,
+    image: z.string().optional(),
   })
   .refine((data) => new Date(data.end) > new Date(data.start), {
     message: "End date/time should be after start date/time",
