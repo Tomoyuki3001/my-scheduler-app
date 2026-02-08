@@ -7,6 +7,7 @@ interface Event {
   _id: string;
   userId: string;
   title: string;
+  category: string;
   description?: string;
   start: string;
   end: string;
@@ -24,6 +25,7 @@ export default function UpdateEventPage() {
   const id = params.id as string;
 
   const [title, setTitle] = useState("");
+  const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [startTime, setStartTime] = useState("");
@@ -38,6 +40,7 @@ export default function UpdateEventPage() {
 
   const hasUnsavedChanges =
     title ||
+    category ||
     description ||
     eventDate ||
     startTime ||
@@ -57,14 +60,14 @@ export default function UpdateEventPage() {
     const d = new Date(iso);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}-${String(d.getDate()).padStart(2, "0")}`;
   };
 
   const isoToTimeInput = (iso: string): string => {
     const d = new Date(iso);
     return `${String(d.getHours()).padStart(2, "0")}:${String(
-      d.getMinutes()
+      d.getMinutes(),
     ).padStart(2, "0")}`;
   };
 
@@ -72,7 +75,7 @@ export default function UpdateEventPage() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
       2,
-      "0"
+      "0",
     )}-${String(d.getDate()).padStart(2, "0")}`;
   })();
 
@@ -118,6 +121,10 @@ export default function UpdateEventPage() {
       setMessage("Title is required");
       return;
     }
+    if (!category) {
+      setMessage("Category is required");
+      return;
+    }
     if (!eventDate) {
       setMessage("Date is required");
       return;
@@ -160,6 +167,7 @@ export default function UpdateEventPage() {
         credentials: "include",
         body: JSON.stringify({
           title,
+          category,
           description,
           start: combineDateTime(eventDate, startTime),
           end: combineDateTime(eventDate, endTime),
@@ -182,7 +190,7 @@ export default function UpdateEventPage() {
       setMessage(
         `Failed to update event: ${
           err instanceof Error ? err.message : "Unknown error"
-        }`
+        }`,
       );
       return;
     }
@@ -197,15 +205,16 @@ export default function UpdateEventPage() {
       })
       .then((data) => {
         setEvents(data.data as Event);
-        setTitle(data.data.title);
-        setDescription(data.data.description ?? "");
-        setEventDate(isoToDateInput(data.data.start));
-        setStartTime(isoToTimeInput(data.data.start));
-        setEndTime(isoToTimeInput(data.data.end));
-        setStreet(data.data.location.street);
-        setCity(data.data.location.city);
-        setState(data.data.location.state);
-        setPostalCode(data.data.location.postalCode);
+        setTitle(data.title);
+        setCategory(data.category);
+        setDescription(data.description ?? "");
+        setEventDate(isoToDateInput(data.start));
+        setStartTime(isoToTimeInput(data.start));
+        setEndTime(isoToTimeInput(data.end));
+        setStreet(data.location.street);
+        setCity(data.location.city);
+        setState(data.location.state);
+        setPostalCode(data.location.postalCode);
       })
       .catch((err) => {
         console.log("Error fetching events", err);
@@ -255,6 +264,24 @@ export default function UpdateEventPage() {
                 className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
                 required
               />
+            </div>
+
+            <div>
+              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                Category
+              </label>
+              <select
+                defaultValue={events?.category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="w-1/3 border border-slate-200 rounded-2xl p-4 text-sm bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              >
+                <option value="concerts">Concerts</option>
+                <option value="sports">Sports</option>
+                <option value="comedy">Comedy</option>
+                <option value="music-shows">Music & Shows</option>
+                <option value="other">Other</option>
+              </select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -371,33 +398,6 @@ export default function UpdateEventPage() {
                   className="w-full border border-slate-200 rounded-2xl p-4 text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-blue-100 focus:border-[#1d63ed] outline-none transition-all"
                   required
                 />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[14px] font-bold text-slate-400 uppercase tracking-widest mb-4">
-                Upload Cover Images
-              </label>
-
-              <div className="border-2 border-dashed border-blue-100 rounded-3xl p-12 flex flex-col items-center justify-center bg-blue-50/20 group hover:border-[#1d63ed] transition-all cursor-pointer">
-                <div className="bg-white p-4 rounded-full shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                  <svg
-                    className="w-8 h-8 text-[#1d63ed]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                    />
-                  </svg>
-                </div>
-                <p className="text-sm font-medium text-blue-600">
-                  You can also drop your files here
-                </p>
               </div>
             </div>
 

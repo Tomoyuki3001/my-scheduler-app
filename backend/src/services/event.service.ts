@@ -71,7 +71,6 @@ export const eventService = {
       userId: req.userId,
       start: { $gte: new Date() },
     }).sort({ start: 1 });
-    console.log(events);
     return events;
   },
 };
